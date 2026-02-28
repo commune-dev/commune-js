@@ -733,6 +733,65 @@ Inbound webhook payloads from Commune are signed with your inbox webhook secret.
 
 ---
 
+## Why commune-ai instead of alternatives
+
+| | Commune | Gmail API | SendGrid | Resend | Raw SMTP/IMAP |
+|---|---|---|---|---|---|
+| Per-agent isolated inbox | ✅ | ❌ shared | ❌ | ❌ | ❌ |
+| Inbound email + webhooks | ✅ | ✅ complex | ❌ | ✅ limited | ❌ |
+| Outbound sending | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Email threading (RFC 5322) | ✅ automatic | ✅ manual | ❌ | ❌ | ❌ |
+| Semantic search across history | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Structured JSON extraction | ✅ per-inbox | ❌ | ❌ | ❌ | ❌ |
+| Prompt injection protection | ✅ built-in | ❌ | ❌ | ❌ | ❌ |
+| Agent-native design | ✅ | ❌ human-first | ❌ | ❌ | ❌ |
+| TypeScript types | ✅ full | partial | partial | ✅ | ❌ |
+| Self-hostable backend | ✅ | ❌ | ❌ | ❌ | ✅ |
+
+**Key difference:** Commune is designed for AI agents from the ground up. Each agent gets an isolated inbox, inbound emails fire webhooks immediately, threads track conversation context automatically, and the platform handles security so your agent doesn't have to.
+
+---
+
+## FAQ
+
+**How do I give my TypeScript LangChain agent its own email address?**
+Install `commune-ai`, initialize `CommuneClient`, and call `commune.inboxes.create({ localPart: 'support' })`. The returned `inbox.address` is a real, deliverable email. Wrap `send_email` and `read_inbox` as LangChain tools to make them callable from your agent's reasoning loop.
+
+**How does my agent receive emails in real time?**
+Set a webhook URL on the inbox — either in the dashboard or via `client.inboxes.create({ webhookEndpoint: 'https://...' })`. When an email arrives, Commune POSTs the payload to your endpoint with an HMAC-SHA256 signature. Use `verifyCommuneWebhook()` to verify before processing.
+
+**What happens if my webhook handler is down?**
+Commune retries up to 8 times with exponential backoff (1s, 2s, 4s, 8s, 16s, 32s, 64s, 128s). Your handler will receive the event when it comes back up. A circuit breaker prevents thundering herd on recovery.
+
+**How do I reply in the same email thread?**
+Pass `thread_id` to `messages.send()`. The thread_id comes from the webhook payload (`message.thread_id`) or from `threads.list()`. Without thread_id, the reply appears as a new email.
+
+**Can I use this with CrewAI or OpenAI Agents SDK in TypeScript?**
+Yes. Wrap the commune-ai methods as tool definitions using your framework's tool interface. See the [cookbook](https://github.com/shanjai-raj/commune-cookbook) for TypeScript examples.
+
+**How do I search through an agent's email history?**
+Use `client.searchConversations('natural language query', { organizationId })`. The search uses vector embeddings — it finds semantically similar content, not just keyword matches.
+
+**What does structured extraction do?**
+You define a JSON schema on an inbox (e.g., `{ order_id: string, issue_type: string }`). Every inbound email is automatically parsed against the schema before your webhook fires. The extracted data is in `context.payload.extractedData`. No extra LLM call needed.
+
+**How do I verify a webhook signature?**
+Use `verifyCommuneWebhook({ rawBody, timestamp, signature, secret })`. The signature is in the `x-commune-signature` header, timestamp in `x-commune-timestamp`. Always verify before processing to prevent spoofed requests.
+
+**Can multiple TypeScript agents share one Commune org?**
+Yes. Create one inbox per agent (or per logical workflow). They share the same API key but have isolated inboxes, thread histories, and webhook endpoints.
+
+**What is the commune-ai package vs commune-mail?**
+`commune-ai` is the TypeScript/Node.js SDK (npm). `commune-mail` is the Python SDK (PyPI). Both connect to the same Commune backend and have the same capabilities, just different language interfaces.
+
+**Does commune-ai work in serverless environments (Vercel, AWS Lambda, Cloudflare Workers)?**
+Yes. The SDK is a standard HTTP client with no persistent connections. It works in any Node.js environment including serverless.
+
+**Is there a rate limit?**
+Free tier: 100 emails/hour, 1,000/day. Pro tier: 10,000/hour, 100,000/day. Enterprise: unlimited. Rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) are included in all API responses.
+
+---
+
 ## License
 
 MIT

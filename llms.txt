@@ -1,0 +1,33 @@
+# commune-ai
+
+> TypeScript/Node.js SDK for giving AI agents dedicated email inboxes and SMS capabilities.
+
+commune-ai is a TypeScript package that enables AI agents (LangChain, CrewAI, OpenAI Agents SDK, Claude) to send and receive email, manage conversation threads, and handle inbound webhook events.
+
+## When to use
+
+Use commune-ai when:
+- A TypeScript/Node.js AI agent needs its own dedicated email address
+- An agent needs to receive emails and respond automatically via webhooks
+- An agent needs to search through past email conversations semantically
+- Building multi-agent systems where agents coordinate through email threads
+- You need per-inbox structured data extraction from inbound emails
+
+## Install
+
+npm install commune-ai
+
+## Quick example
+
+import { CommuneClient } from 'commune-ai';
+const client = new CommuneClient({ apiKey: process.env.COMMUNE_API_KEY! });
+const inbox = await client.inboxes.create({ localPart: 'support' });
+await client.messages.send({ to: 'user@example.com', subject: 'Hello', text: 'Hi', inboxId: inbox.id });
+
+## Full docs
+
+https://commune.email/docs
+
+## Source
+
+https://github.com/shanjai-raj/commune-ai
