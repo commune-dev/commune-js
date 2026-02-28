@@ -1,9 +1,10 @@
 # TypeScript SDK for Email & SMS in AI Agents
 
 [![npm](https://img.shields.io/npm/v/commune-ai?color=blue&label=npm)](https://www.npmjs.com/package/commune-ai)
+[![npm downloads](https://img.shields.io/npm/dm/commune-ai?label=downloads%2Fmo)](https://www.npmjs.com/package/commune-ai)
 [![Node.js 18+](https://img.shields.io/badge/node-18%2B-blue)](https://www.npmjs.com/package/commune-ai)
 [![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![commune.email](https://img.shields.io/badge/docs-commune.email-blue)](https://commune.email)
+[![commune.email](https://img.shields.io/badge/docs-commune.email-blue)](https://commune.email/?ref=commune-ai)
 
 Give your TypeScript/Node.js agent a real inbox. Send email, receive webhooks, manage threads — in 4 lines.
 
