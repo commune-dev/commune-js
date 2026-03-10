@@ -20,7 +20,7 @@ await commune.messages.send({
   to: 'user@example.com',
   subject: 'From your agent',
   text: 'Task complete.',
-  inboxId: 'agent@yourdomain.com'
+  inboxId: process.env.COMMUNE_INBOX_ID!  // inbox ID from dashboard (e.g. "inbox_...")
 });
 ```
 
